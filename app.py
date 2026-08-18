@@ -1,13 +1,14 @@
 import streamlit as st
 import pandas as pd
 import xml.etree.ElementTree as ET
+import re
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils.dataframe import dataframe_to_rows
 from io import BytesIO
 
 # Configuração da página
-st.set_page_config(page_title="Conversor de NFe para Excel", layout="centered", page_icon="📄")
+st.set_page_config(page_title="Conversor de NFe para Excel", layout="wide", page_icon="📄")
 
 # --- CONTROLE DE ACESSO POR SENHA ---
 SENHA_DE_ACESSO = st.secrets.get("SENHA_ACESSO", "suasenha123")
@@ -34,7 +35,7 @@ if not verificar_autenticacao():
 
 # --- APLICAÇÃO PRINCIPAL ---
 st.title("📄 Conversor de Notas Fiscais (XML) para Excel")
-st.write("Selecione ou arraste os arquivos XML das notas fiscais e baixe o relatório consolidado.")
+st.write("Selecione ou arraste múltiplos arquivos XML de notas fiscais para consolidar todos os produtos em uma planilha.")
 
 # Botão de logout no menu lateral
 with st.sidebar:
@@ -44,100 +45,119 @@ with st.sidebar:
         st.rerun()
 
 arquivos_xml = st.file_uploader(
-    "Selecione um ou mais arquivos XML", 
+    "Arraste ou selecione todos os arquivos XML", 
     type=["xml"], 
     accept_multiple_files=True
 )
 
-def processar_xmls(arquivos):
-    rows = []
-    ns = {'nfe': 'http://www.portalfiscal.inf.br/nfe'}
+def parse_xml_content(content_bytes, file_name=""):
+    # Decodificação robusta para evitar falhas de charset
+    try:
+        text = content_bytes.decode('utf-8')
+    except UnicodeDecodeError:
+        try:
+            text = content_bytes.decode('iso-8859-1')
+        except Exception:
+            text = content_bytes.decode('utf-8', errors='ignore')
+            
+    # Remove declarações de namespace para garantir compatibilidade total
+    text = re.sub(r'\sxmlns(:\w+)?="[^"]+"', '', text)
+    root = ET.fromstring(text)
+    
+    # Procura bloco de informações da nota (NFe, NFCe ou CFe SAT)
+    inf = root.find('.//infNFe')
+    if inf is None:
+        inf = root.find('.//infCFe')
+    if inf is None:
+        inf = root.find('.//infNFCe')
+    if inf is None:
+        inf = root
+        
+    # Dados do Fornecedor / Emitente
+    nome_fornecedor = ''
+    endereco_fornecedor = ''
+    emit = inf.find('.//emit')
+    if emit is not None:
+        xNome = emit.find('xNome')
+        nome_fornecedor = xNome.text if xNome is not None and xNome.text else ''
+        
+        ender = emit.find('enderEmit')
+        if ender is not None:
+            def get_field(tag):
+                el = ender.find(tag)
+                return el.text if el is not None and el.text else ''
+            
+            lgr = get_field('xLgr')
+            nro = get_field('nro')
+            bairro = get_field('xBairro')
+            mun = get_field('xMun')
+            uf = get_field('UF')
+            endereco_fornecedor = f"{lgr}, {nro} - {bairro}, {mun} - {uf}".strip(" ,-")
+            
+    # Extração dos itens
+    dets = inf.findall('.//det')
+    itens = []
+    for det in dets:
+        prod = det.find('prod')
+        if prod is None:
+            continue
+            
+        def get_val(tag, default=''):
+            el = prod.find(tag)
+            return el.text if el is not None and el.text else default
+            
+        cProd = get_val('cProd')
+        cEAN = get_val('cEAN')
+        xProd = get_val('xProd')
+        qCom_str = get_val('qCom', '0')
+        vUnCom_str = get_val('vUnCom', '0')
+        vProd_str = get_val('vProd', '0')
+        
+        try:
+            qCom = float(qCom_str)
+        except ValueError:
+            qCom = 0.0
+            
+        try:
+            vUnCom = float(vUnCom_str)
+        except ValueError:
+            vUnCom = 0.0
+            
+        try:
+            vProd = float(vProd_str)
+        except ValueError:
+            vProd = 0.0
+            
+        itens.append({
+            'Arquivo': file_name,
+            'Nome do Estabelecimento': nome_fornecedor,
+            'Endereço': endereco_fornecedor,
+            'Código do Produto': cProd,
+            'EAN': cEAN,
+            'Descrição do Produto': xProd,
+            'Quantidade': qCom,
+            'Custo Unitário (R$)': vUnCom,
+            'Custo Total (R$)': vProd
+        })
+        
+    return itens
+
+def processar_todos_xmls(arquivos):
+    todos_itens = []
+    arquivos_com_erro = []
     
     for arquivo in arquivos:
         try:
-            tree = ET.parse(arquivo)
-            root = tree.getroot()
-            
-            # Busca infNFe com ou sem namespace
-            infNFe = root.find('.//nfe:infNFe', ns)
-            if infNFe is None:
-                infNFe = root.find('.//infNFe')
-                ns_used = {}
+            conteudo = arquivo.read()
+            itens = parse_xml_content(conteudo, file_name=arquivo.name)
+            if itens:
+                todos_itens.extend(itens)
             else:
-                ns_used = ns
-            
-            if infNFe is None:
-                continue
-                
-            # Dados do Fornecedor / Emitente
-            emit = infNFe.find('nfe:emit', ns_used) if ns_used else infNFe.find('emit')
-            nome_fornecedor = ''
-            endereco_fornecedor = ''
-            
-            if emit is not None:
-                xNome = emit.find('nfe:xNome', ns_used) if ns_used else emit.find('xNome')
-                nome_fornecedor = xNome.text if xNome is not None and xNome.text else ''
-                
-                ender = emit.find('nfe:enderEmit', ns_used) if ns_used else emit.find('enderEmit')
-                if ender is not None:
-                    def get_field(tag):
-                        el = ender.find(f'nfe:{tag}', ns_used) if ns_used else ender.find(tag)
-                        return el.text if el is not None and el.text else ''
-                    
-                    lgr = get_field('xLgr')
-                    nro = get_field('nro')
-                    bairro = get_field('xBairro')
-                    mun = get_field('xMun')
-                    uf = get_field('UF')
-                    endereco_fornecedor = f"{lgr}, {nro} - {bairro}, {mun} - {uf}".strip(" ,-")
-            
-            # Dados dos Itens / Produtos
-            dets = infNFe.findall('nfe:det', ns_used) if ns_used else infNFe.findall('det')
-            for det in dets:
-                prod = det.find('nfe:prod', ns_used) if ns_used else det.find('prod')
-                if prod is None:
-                    continue
-                
-                def get_prod_val(tag, default=''):
-                    el = prod.find(f'nfe:{tag}', ns_used) if ns_used else prod.find(tag)
-                    return el.text if el is not None and el.text else default
-                
-                cProd = get_prod_val('cProd')
-                cEAN = get_prod_val('cEAN')
-                xProd = get_prod_val('xProd')
-                qCom_str = get_prod_val('qCom', '0')
-                vUnCom_str = get_prod_val('vUnCom', '0')
-                vProd_str = get_prod_val('vProd', '0')
-                
-                try:
-                    qCom = float(qCom_str)
-                except ValueError:
-                    qCom = 0.0
-                    
-                try:
-                    vUnCom = float(vUnCom_str)
-                except ValueError:
-                    vUnCom = 0.0
-                    
-                try:
-                    vProd = float(vProd_str)
-                except ValueError:
-                    vProd = 0.0
-                
-                rows.append({
-                    'Nome do Estabelecimento': nome_fornecedor,
-                    'Endereço': endereco_fornecedor,
-                    'Código do Produto': cProd,
-                    'EAN': cEAN,
-                    'Descrição do Produto': xProd,
-                    'Quantidade': qCom,
-                    'Custo Unitário (R$)': vUnCom,
-                    'Custo Total (R$)': vProd
-                })
+                arquivos_com_erro.append(f"{arquivo.name} (nenhum produto encontrado)")
         except Exception as e:
-            st.error(f"Erro ao processar o arquivo {getattr(arquivo, 'name', 'XML')}: {e}")
+            arquivos_com_erro.append(f"{arquivo.name} (erro: {e})")
             
-    return pd.DataFrame(rows)
+    return pd.DataFrame(todos_itens), arquivos_com_erro
 
 def gerar_excel(df):
     wb = Workbook()
@@ -157,14 +177,14 @@ def gerar_excel(df):
         bottom=Side(style='thin', color='D9D9D9')
     )
 
-    # Estiliza as células do cabeçalho (linha 1)
+    # Estiliza o cabeçalho
     for cell in ws:
         cell.fill = header_fill
         cell.font = header_font
         cell.alignment = align_center
         cell.border = border
 
-    # Insere e estiliza as linhas de dados
+    # Insere dados e formata células
     for r_idx, row in enumerate(dataframe_to_rows(df, index=False, header=False), 2):
         fill = PatternFill(start_color="F9F9F9", end_color="F9F9F9", fill_type="solid") if r_idx % 2 == 0 else PatternFill(fill_type=None)
         for c_idx, value in enumerate(row, 1):
@@ -178,12 +198,12 @@ def gerar_excel(df):
             elif header in ['Custo Unitário (R$)', 'Custo Total (R$)']:
                 cell.number_format = '"R$ "#,##0.00'
                 cell.alignment = align_center
-            elif header in ['Código do Produto', 'EAN']:
+            elif header in ['Código do Produto', 'EAN', 'Arquivo']:
                 cell.alignment = align_center
             else:
                 cell.alignment = align_left
 
-    # Ajusta a largura das colunas
+    # Ajusta largura das colunas
     for col in ws.columns:
         max_length = 0
         column = col[0].column_letter
@@ -204,20 +224,33 @@ def gerar_excel(df):
 
 if arquivos_xml:
     if st.button("Processar Notas Fiscais", type="primary"):
-        with st.spinner("Extraindo informações dos XMLs e gerando planilha..."):
-            df_resultados = processar_xmls(arquivos_xml)
+        with st.spinner("Lendo todos os arquivos XML e montando a planilha..."):
+            df_resultados, erros = processar_todos_xmls(arquivos_xml)
             
             if not df_resultados.empty:
-                st.success(f"Processamento concluído! {len(df_resultados)} itens extraídos.")
-                st.dataframe(df_resultados.head(10))
+                st.success(f"Sucesso! {len(arquivos_xml)} arquivo(s) processado(s) — total de {len(df_resultados)} produtos extraídos.")
                 
+                if erros:
+                    with st.expander("Avisos sobre arquivos não lidos:"):
+                        for err in erros:
+                            st.warning(err)
+                
+                # Gera o arquivo Excel oficial
                 excel_data = gerar_excel(df_resultados)
                 
+                # Botão oficial para baixar o arquivo .xlsx
                 st.download_button(
-                    label="📥 Baixar Planilha Formatada (.xlsx)",
+                    label="📥 Baixar Planilha Excel Formatada (.xlsx)",
                     data=excel_data,
                     file_name="Relatorio_Notas_Fiscais.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    type="primary"
                 )
+                
+                st.write("### Prévia dos dados extraídos:")
+                st.dataframe(df_resultados, use_container_width=True)
             else:
-                st.warning("Nenhum item válido encontrado nos arquivos XML fornecidos.")
+                st.error("Não foi possível extrair produtos dos arquivos enviados.")
+                if erros:
+                    for err in erros:
+                        st.warning(err)
