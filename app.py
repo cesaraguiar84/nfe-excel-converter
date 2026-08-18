@@ -10,7 +10,6 @@ from io import BytesIO
 st.set_page_config(page_title="Conversor de NFe para Excel", layout="centered", page_icon="📄")
 
 # --- CONTROLE DE ACESSO POR SENHA ---
-# Defina aqui a senha que você passará para os 2 colaboradores
 SENHA_DE_ACESSO = st.secrets.get("SENHA_ACESSO", "suasenha123")
 
 def verificar_autenticacao():
@@ -158,12 +157,14 @@ def gerar_excel(df):
         bottom=Side(style='thin', color='D9D9D9')
     )
 
+    # Estiliza as células do cabeçalho (linha 1)
     for cell in ws:
         cell.fill = header_fill
         cell.font = header_font
         cell.alignment = align_center
         cell.border = border
 
+    # Insere e estiliza as linhas de dados
     for r_idx, row in enumerate(dataframe_to_rows(df, index=False, header=False), 2):
         fill = PatternFill(start_color="F9F9F9", end_color="F9F9F9", fill_type="solid") if r_idx % 2 == 0 else PatternFill(fill_type=None)
         for c_idx, value in enumerate(row, 1):
@@ -182,6 +183,7 @@ def gerar_excel(df):
             else:
                 cell.alignment = align_left
 
+    # Ajusta a largura das colunas
     for col in ws.columns:
         max_length = 0
         column = col[0].column_letter
