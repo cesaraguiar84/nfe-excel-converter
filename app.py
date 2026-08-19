@@ -177,7 +177,7 @@ def gerar_excel(df):
         bottom=Side(style='thin', color='D9D9D9')
     )
 
-    # Estiliza o cabeçalho
+    # Estiliza apenas a linha 1 (cabeçalho)
     for cell in ws:
         cell.fill = header_fill
         cell.font = header_font
@@ -235,10 +235,10 @@ if arquivos_xml:
                         for err in erros:
                             st.warning(err)
                 
-                # Gera o arquivo Excel oficial
+                # Gera o arquivo Excel (.xlsx)
                 excel_data = gerar_excel(df_resultados)
                 
-                # Botão oficial para baixar o arquivo .xlsx
+                # Botão de download do Excel
                 st.download_button(
                     label="📥 Baixar Planilha Excel Formatada (.xlsx)",
                     data=excel_data,
