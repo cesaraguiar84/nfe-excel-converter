@@ -177,14 +177,15 @@ def gerar_excel(df):
         bottom=Side(style='thin', color='D9D9D9')
     )
 
-    # Estiliza apenas a linha 1 (cabeçalho)
-    for cell in ws:
-        cell.fill = header_fill
-        cell.font = header_font
-        cell.alignment = align_center
-        cell.border = border
+    # 1. Estiliza o cabeçalho explicitamente por coluna
+    for col_idx in range(1, len(headers) + 1):
+        cell_header = ws.cell(row=1, column=col_idx)
+        cell_header.fill = header_fill
+        cell_header.font = header_font
+        cell_header.alignment = align_center
+        cell_header.border = border
 
-    # Insere dados e formata células
+    # 2. Insere dados e formata células
     for r_idx, row in enumerate(dataframe_to_rows(df, index=False, header=False), 2):
         fill = PatternFill(start_color="F9F9F9", end_color="F9F9F9", fill_type="solid") if r_idx % 2 == 0 else PatternFill(fill_type=None)
         for c_idx, value in enumerate(row, 1):
@@ -203,7 +204,7 @@ def gerar_excel(df):
             else:
                 cell.alignment = align_left
 
-    # Ajusta largura das colunas
+    # 3. Ajusta largura das colunas
     for col in ws.columns:
         max_length = 0
         column = col[0].column_letter
