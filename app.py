@@ -14,102 +14,82 @@ st.set_page_config(
     page_icon="⚡"
 )
 
-# 2. Estilo Visual Futurista com ALTO CONTRASTE E LEGIBILIDADE MÁXIMA
+# 2. Estilo Visual Otimizado (Dark Mode + Alto Contraste)
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Rajdhani:wght@600;700&display=swap');
-
-    /* Fundo Geral e Cores Globais */
     .stApp {
         background-color: #0B0F19 !important;
-        background-image: radial-gradient(at 0% 0%, rgba(0, 240, 255, 0.08) 0px, transparent 50%),
-                          radial-gradient(at 100% 100%, rgba(124, 58, 237, 0.08) 0px, transparent 50%) !important;
-        color: #F8FAFC !important;
-        font-family: 'Inter', sans-serif !important;
+        background-image: radial-gradient(circle at 10% 20%, rgba(0, 240, 255, 0.06) 0%, transparent 40%),
+                          radial-gradient(circle at 90% 80%, rgba(138, 43, 226, 0.06) 0%, transparent 40%) !important;
+        color: #FFFFFF !important;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
     }
 
-    /* Sidebar em Modo Escuro Unificado */
     section[data-testid="stSidebar"] {
         background-color: #0D131F !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
     section[data-testid="stSidebar"] * {
-        color: #E2E8F0 !important;
+        color: #FFFFFF !important;
     }
 
-    /* Textos Gerais e Rótulos com Contraste Total */
     p, span, label, div {
-        color: #E2E8F0 !important;
+        color: #FFFFFF !important;
     }
     
-    /* Títulos */
     h1, h2, h3, h4, h5, h6 {
         color: #FFFFFF !important;
         font-weight: 700 !important;
     }
 
-    /* Textos dos Radio Buttons (Modo de Consolidação) */
     div[data-testid="stRadio"] label, 
     div[data-testid="stRadio"] label p, 
-    div[data-testid="stRadio"] div[role="radiogroup"] span {
-        color: #F8FAFC !important;
-        font-size: 15px !important;
-        font-weight: 500 !important;
-    }
-
-    /* Textos dos Checkboxes (Seleção de Colunas) */
+    div[data-testid="stRadio"] span,
     div[data-testid="stCheckbox"] label, 
     div[data-testid="stCheckbox"] label p, 
     div[data-testid="stCheckbox"] span {
-        color: #F8FAFC !important;
+        color: #FFFFFF !important;
         font-size: 15px !important;
         font-weight: 500 !important;
     }
 
-    /* Cabeçalho Principal */
     .cyber-header {
-        background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.8));
-        border: 1px solid rgba(0, 240, 255, 0.3);
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.85));
+        border: 1px solid rgba(0, 240, 255, 0.35);
         border-radius: 16px;
-        padding: 24px 30px;
-        margin-bottom: 28px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 240, 255, 0.08);
+        padding: 22px 28px;
+        margin-bottom: 24px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     }
     .cyber-tag {
-        font-family: 'Rajdhani', sans-serif;
         color: #00F0FF !important;
-        font-size: 13px;
-        font-weight: 700;
-        letter-spacing: 3px;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 2px;
         text-transform: uppercase;
     }
     .cyber-title {
         color: #FFFFFF !important;
-        font-size: 30px;
+        font-size: 28px;
         font-weight: 800;
         margin: 4px 0 6px 0;
     }
     .cyber-desc {
-        color: #94A3B8 !important;
-        font-size: 14.5px;
+        color: #CBD5E1 !important;
+        font-size: 14px;
         margin: 0;
     }
 
-    /* Área de Upload */
     div[data-testid="stFileUploader"] {
         background: #111827 !important;
-        border: 1px dashed rgba(0, 240, 255, 0.4) !important;
+        border: 1px dashed rgba(0, 240, 255, 0.45) !important;
         border-radius: 14px !important;
-        padding: 20px !important;
+        padding: 18px !important;
     }
-    div[data-testid="stFileUploader"] section {
-        background: transparent !important;
-    }
-    div[data-testid="stFileUploader"] section * {
-        color: #E2E8F0 !important;
+    div[data-testid="stFileUploader"] * {
+        color: #FFFFFF !important;
     }
 
-    /* Botão Principal */
     div.stButton > button:first-child {
         background: linear-gradient(135deg, #00F0FF 0%, #3B82F6 50%, #8B5CF6 100%) !important;
         color: #FFFFFF !important;
@@ -117,16 +97,10 @@ st.markdown("""
         font-size: 16px !important;
         border: none !important;
         border-radius: 12px !important;
-        padding: 16px 28px !important;
-        box-shadow: 0 4px 20px rgba(0, 240, 255, 0.3) !important;
-        transition: all 0.2s ease !important;
-    }
-    div.stButton > button:first-child:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 6px 25px rgba(0, 240, 255, 0.5) !important;
+        padding: 14px 28px !important;
+        box-shadow: 0 4px 20px rgba(0, 240, 255, 0.35) !important;
     }
 
-    /* Botão de Download */
     div.stDownloadButton > button:first-child {
         background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
         color: #FFFFFF !important;
@@ -134,37 +108,34 @@ st.markdown("""
         font-size: 16px !important;
         border: none !important;
         border-radius: 12px !important;
-        padding: 16px 28px !important;
-        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3) !important;
+        padding: 14px 28px !important;
+        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.35) !important;
     }
 
-    /* Indicadores / KPIs */
     .kpi-container {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 16px;
-        margin: 24px 0;
+        margin: 20px 0;
     }
     .kpi-box {
         background: #111827;
-        border: 1px solid rgba(0, 240, 255, 0.25);
+        border: 1px solid rgba(0, 240, 255, 0.3);
         border-radius: 14px;
-        padding: 18px 22px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        padding: 16px 20px;
     }
     .kpi-label {
         font-size: 12px;
         color: #94A3B8 !important;
         text-transform: uppercase;
         letter-spacing: 1px;
-        font-weight: 600;
+        font-weight: 700;
     }
     .kpi-value {
-        font-size: 26px;
+        font-size: 24px;
         font-weight: 800;
         color: #00F0FF !important;
         margin-top: 4px;
-        font-family: 'Rajdhani', sans-serif;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -178,11 +149,11 @@ def verificar_autenticacao():
 
     if not st.session_state.autenticado:
         st.markdown("""
-        <div style="max-width: 480px; margin: 60px auto 20px auto; background: #111827; border: 1px solid rgba(0, 240, 255, 0.3); border-radius: 20px; padding: 30px; text-align: center;">
-            <div style="font-size: 36px; margin-bottom: 8px;">🔐</div>
-            <div style="font-family: 'Rajdhani', sans-serif; color: #00F0FF; font-size: 13px; letter-spacing: 3px; font-weight: 700;">ACESSO SEGURO</div>
-            <h2 style="color: #FFF; margin: 6px 0 10px 0; font-size: 24px;">Conversor de XML em dados</h2>
-            <p style="color: #CBD5E1; font-size: 14px; margin: 0;">Insira a credencial de segurança para acessar o sistema.</p>
+        <div style="max-width: 460px; margin: 50px auto 20px auto; background: #111827; border: 1px solid rgba(0, 240, 255, 0.35); border-radius: 18px; padding: 28px; text-align: center;">
+            <div style="font-size: 36px; margin-bottom: 6px;">🔐</div>
+            <div style="color: #00F0FF; font-size: 13px; letter-spacing: 2px; font-weight: 800;">ACESSO SEGURO</div>
+            <h2 style="color: #FFF; margin: 6px 0 10px 0; font-size: 22px;">Conversor de XML em dados</h2>
+            <p style="color: #CBD5E1; font-size: 13.5px; margin: 0;">Insira a credencial de segurança para acessar o sistema.</p>
         </div>
         """, unsafe_allow_html=True)
         
@@ -221,7 +192,7 @@ with st.sidebar:
 
 # 5. Upload de Arquivos
 st.markdown("### 📂 1. Importação de Arquivos XML")
-st.markdown("<p style='color: #CBD5E1; font-size: 14.5px;'>Selecione ou arraste os arquivos XML das notas fiscais (suporta modelos 55, 65 e 59):</p>", unsafe_allow_html=True)
+st.markdown("<p style='color: #CBD5E1; font-size: 14px;'>Selecione ou arraste os arquivos XML das notas fiscais (modelos 55, 65 e 59):</p>", unsafe_allow_html=True)
 arquivos_xml = st.file_uploader("Upload de XMLs", type=["xml"], accept_multiple_files=True, label_visibility="collapsed")
 
 st.markdown("<br>", unsafe_allow_html=True)
@@ -233,8 +204,8 @@ col_card1, col_card2 = st.columns(2)
 with col_card1:
     st.markdown("""
     <div style="background: #111827; border: 1px solid rgba(0, 240, 255, 0.25); border-radius: 12px; padding: 14px 18px; margin-bottom: 12px;">
-        <span style="color: #00F0FF; font-weight: 700; font-size: 14px; letter-spacing: 1px;">📊 REGRA DE DUPLICADOS</span>
-        <p style="color: #CBD5E1; font-size: 13px; margin: 4px 0 0 0;">Como consolidar itens repetidos ao longo dos meses:</p>
+        <span style="color: #00F0FF; font-weight: 700; font-size: 13.5px; letter-spacing: 1px;">📊 REGRA DE DUPLICADOS</span>
+        <p style="color: #CBD5E1; font-size: 12.5px; margin: 4px 0 0 0;">Como consolidar itens repetidos ao longo dos meses:</p>
     </div>
     """, unsafe_allow_html=True)
     modo_consolidacao = st.radio(
@@ -251,27 +222,26 @@ with col_card1:
 with col_card2:
     st.markdown("""
     <div style="background: #111827; border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 12px; padding: 14px 18px; margin-bottom: 12px;">
-        <span style="color: #C084FC; font-weight: 700; font-size: 14px; letter-spacing: 1px;">📌 SELEÇÃO DE CAMPOS EXPORTADOS</span>
-        <p style="color: #CBD5E1; font-size: 13px; margin: 4px 0 0 0;">Marque as colunas que devem constar no relatório:</p>
+        <span style="color: #C084FC; font-weight: 700; font-size: 13.5px; letter-spacing: 1px;">📌 SELEÇÃO DE CAMPOS EXPORTADOS</span>
+        <p style="color: #CBD5E1; font-size: 12.5px; margin: 4px 0 0 0;">Marque as colunas que devem constar no relatório:</p>
     </div>
     """, unsafe_allow_html=True)
     c1, c2 = st.columns(2)
     with c1:
-        f_arquivo = st.checkbox("Arquivo", value=True)
-        f_data = st.checkbox("Data", value=True)
         f_estab = st.checkbox("Estabelecimento", value=True)
         f_end = st.checkbox("Endereço", value=True)
         f_cod = st.checkbox("Código do Produto", value=True)
-    with c2:
         f_ean = st.checkbox("EAN", value=True)
         f_desc = st.checkbox("Descrição do Produto", value=True)
+    with c2:
         f_qtd = st.checkbox("Quantidade", value=True)
         f_unit = st.checkbox("Custo Unitário", value=True)
         f_total = st.checkbox("Custo Total", value=True)
+        f_data = st.checkbox("Data", value=True)
+        f_arquivo = st.checkbox("Arquivo", value=True)
 
+# Lista de colunas marcadas
 colunas_selecionadas = []
-if f_arquivo: colunas_selecionadas.append("Arquivo")
-if f_data: colunas_selecionadas.append("Data")
 if f_estab: colunas_selecionadas.append("Estabelecimento")
 if f_end: colunas_selecionadas.append("Endereço")
 if f_cod: colunas_selecionadas.append("Código do Produto")
@@ -280,6 +250,8 @@ if f_desc: colunas_selecionadas.append("Descrição do Produto")
 if f_qtd: colunas_selecionadas.append("Quantidade")
 if f_unit: colunas_selecionadas.append("Custo Unitário")
 if f_total: colunas_selecionadas.append("Custo Total")
+if f_data: colunas_selecionadas.append("Data")
+if f_arquivo: colunas_selecionadas.append("Arquivo")
 
 # 7. Funções de Processamento de XML
 def parse_xml_content(content_bytes, file_name=""):
@@ -291,48 +263,57 @@ def parse_xml_content(content_bytes, file_name=""):
         except Exception:
             text = content_bytes.decode('utf-8', errors='ignore')
             
-    text = re.sub(r'\sxmlns(:\w+)?="[^"]+"', '', text)
-    root = ET.fromstring(text)
-    
-    inf = root.find('.//infNFe')
-    if inf is None:
-        inf = root.find('.//infCFe')
-    if inf is None:
-        inf = root.find('.//infNFCe')
-    if inf is None:
-        inf = root
+    clean_text = re.sub(r'<(/?)(\w+):', r'<\1', text)
+    clean_text = re.sub(r'\sxmlns(:\w+)?="[^"]+"', '', clean_text)
+    root = ET.fromstring(clean_text)
 
+    # 1. Dados da NF (Data e Número)
     numero_nf = ''
     data_emissao = ''
     data_iso = ''
-    ide = inf.find('.//ide')
-    if ide is not None:
-        nNF_el = ide.find('nNF')
-        if nNF_el is not None and nNF_el.text:
-            numero_nf = nNF_el.text
-            
-        dhEmi_el = ide.find('dhEmi') or ide.find('dEmi')
-        if dhEmi_el is not None and dhEmi_el.text:
-            raw_date = dhEmi_el.text[:10]
-            data_iso = raw_date
-            parts = raw_date.split('-')
-            if len(parts) == 3:
-                data_emissao = f"{parts}/{parts}/{parts[0]}"
-            else:
-                data_emissao = raw_date
+    
+    nNF_el = root.find('.//nNF') or root.find('.//nCFe') or root.find('.//nDoc')
+    if nNF_el is not None and nNF_el.text:
+        numero_nf = nNF_el.text.strip()
         
+    for tag in ['dhEmi', 'dEmi', 'dhSaiEnt', 'dSaiEnt', 'dhRecbto', 'dCompet']:
+        el = root.find(f'.//{tag}')
+        if el is not None and el.text and el.text.strip():
+            raw = el.text.strip()
+            if '-' in raw and len(raw) >= 10:
+                iso_part = raw[:10]
+                p = iso_part.split('-')
+                if len(p) == 3 and len(p[0]) == 4:
+                    data_emissao = f"{p}/{p}/{p[0]}"
+                    data_iso = iso_part
+                    break
+            elif len(raw) == 8 and raw.isdigit():
+                yyyy, mm, dd = raw[:4], raw[4:6], raw[6:8]
+                data_emissao = f"{dd}/{mm}/{yyyy}"
+                data_iso = f"{yyyy}-{mm}-{dd}"
+                break
+                
+    if not data_emissao:
+        match = re.search(r'<(?:dhEmi|dEmi|dhSaiEnt|dhRecbto)[^>]*>(\d{4}-\d{2}-\d{2})', text)
+        if match:
+            iso_part = match.group(1)
+            p = iso_part.split('-')
+            data_emissao = f"{p}/{p}/{p[0]}"
+            data_iso = iso_part
+        
+    # 2. Fornecedor
     nome_fornecedor = ''
     endereco_fornecedor = ''
-    emit = inf.find('.//emit')
+    emit = root.find('.//emit')
     if emit is not None:
         xNome = emit.find('xNome')
-        nome_fornecedor = xNome.text if xNome is not None and xNome.text else ''
+        nome_fornecedor = xNome.text.strip() if xNome is not None and xNome.text else ''
         
         ender = emit.find('enderEmit')
         if ender is not None:
             def get_field(tag):
                 el = ender.find(tag)
-                return el.text if el is not None and el.text else ''
+                return el.text.strip() if el is not None and el.text else ''
             
             lgr = get_field('xLgr')
             nro = get_field('nro')
@@ -341,7 +322,8 @@ def parse_xml_content(content_bytes, file_name=""):
             uf = get_field('UF')
             endereco_fornecedor = f"{lgr}, {nro} - {bairro}, {mun} - {uf}".strip(" ,-")
             
-    dets = inf.findall('.//det')
+    # 3. Itens
+    dets = root.findall('.//det')
     itens = []
     for det in dets:
         prod = det.find('prod')
@@ -350,7 +332,7 @@ def parse_xml_content(content_bytes, file_name=""):
             
         def get_val(tag, default=''):
             el = prod.find(tag)
-            return el.text if el is not None and el.text else default
+            return el.text.strip() if el is not None and el.text else default
             
         cProd = get_val('cProd')
         cEAN = get_val('cEAN')
@@ -375,10 +357,6 @@ def parse_xml_content(content_bytes, file_name=""):
             vProd = 0.0
             
         itens.append({
-            'Arquivo': file_name,
-            'Data': data_emissao,
-            'Data_ISO': data_iso,
-            'Número da NF': numero_nf,
             'Estabelecimento': nome_fornecedor,
             'Endereço': endereco_fornecedor,
             'Código do Produto': cProd,
@@ -386,7 +364,11 @@ def parse_xml_content(content_bytes, file_name=""):
             'Descrição do Produto': xProd,
             'Quantidade': qCom,
             'Custo Unitário': vUnCom,
-            'Custo Total': vProd
+            'Custo Total': vProd,
+            'Data': data_emissao,
+            'Data_ISO': data_iso,
+            'Número da NF': numero_nf,
+            'Arquivo': file_name
         })
         
     return itens
@@ -415,10 +397,13 @@ def aplicar_tratamento_e_colunas(df, modo, colunas_escolhidas):
     if 'Data_ISO' in df.columns:
         df = df.sort_values(by=['Data_ISO', 'Número da NF'])
 
-    group_cols = ['Estabelecimento', 'Endereço', 'Código do Produto', 'EAN', 'Descrição do Produto']
+    # Agrupa exclusivamente pelo PRODUTO (eliminando duplicados entre filiais/lojas)
+    group_cols = ['Código do Produto', 'EAN', 'Descrição do Produto']
 
     if modo.startswith("Consolidar produtos"):
         df_agrupado = df.groupby(group_cols, as_index=False).agg(
+            Estabelecimento=('Estabelecimento', 'last'),
+            Endereço=('Endereço', 'last'),
             Quantidade=('Quantidade', 'sum'),
             Custo_Total=('Custo Total', 'sum'),
             Ultimo_Custo=('Custo Unitário', 'last'),
@@ -435,8 +420,16 @@ def aplicar_tratamento_e_colunas(df, modo, colunas_escolhidas):
     else:
         df_final = df.copy()
 
-    colunas_validas = [c for c in colunas_escolhidas if c in df_final.columns]
-    return df_final[colunas_validas]
+    # Ordem das Colunas solicitada:
+    # Estabelecimento, Endereço, Código do Produto, EAN, Descrição do Produto, Quantidade, Custo Unitário, Custo Total (Antepenúltima), Data (Penúltima), Arquivo (Última)
+    ordem_padrao = [
+        'Estabelecimento', 'Endereço', 'Código do Produto', 'EAN', 
+        'Descrição do Produto', 'Quantidade', 'Custo Unitário', 
+        'Custo Total', 'Data', 'Arquivo'
+    ]
+
+    colunas_finais = [c for c in ordem_padrao if c in colunas_escolhidas and c in df_final.columns]
+    return df_final[colunas_finais]
 
 def gerar_excel(df, titulo_aba="Notas Fiscais"):
     wb = Workbook()
