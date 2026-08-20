@@ -205,29 +205,3 @@ arquivos_xml = st.file_uploader(
     "Selecione ou arraste todos os arquivos XML", 
     type=["xml"], 
     accept_multiple_files=True,
-    help="Suporta notas fiscais dos modelos NF-e (55), NFC-e (65) e SAT CF-e (59)."
-)
-
-# 2. Configurações de Consolidação e Colunas
-st.markdown("#### ⚙️ 2. Parâmetros de Consolidação e Colunas")
-col_card1, col_card2 = st.columns(2)
-
-with col_card1:
-    st.markdown("""
-    <div class="glass-card">
-        <span style="color: #00F0FF; font-weight: 700; font-size: 14px;">📊 REGRA DE DUPLICADOS</span>
-        <p style="color: #94A3B8; font-size: 13px; margin: 4px 0 12px 0;">Como consolidar itens repetidos ao longo dos meses:</p>
-    </div>
-    """, unsafe_allow_html=True)
-    modo_consolidacao = st.radio(
-        "Modo de consolidação:",
-        options=[
-            "Consolidar produtos (Somar quantidades e calcular custo médio)",
-            "Manter apenas o preço da última compra (Custo mais recente)",
-            "Listar todas as compras (Histórico completo sem agrupar)"
-        ],
-        index=0,
-        label_visibility="collapsed"
-    )
-
-with col_card2
