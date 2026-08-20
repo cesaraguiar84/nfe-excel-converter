@@ -14,101 +14,157 @@ st.set_page_config(
     page_icon="⚡"
 )
 
-# 2. Estilo Visual Futurista (Dark Mode + Glassmorphism)
+# 2. Estilo Visual Futurista com ALTO CONTRASTE E LEGIBILIDADE MÁXIMA
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Rajdhani:wght@600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Rajdhani:wght@600;700&display=swap');
 
+    /* Fundo Geral e Cores Globais */
     .stApp {
-        background: radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.05) 0%, transparent 40%),
-                    radial-gradient(circle at 85% 85%, rgba(138, 43, 226, 0.05) 0%, transparent 40%),
-                    #090D14;
-        color: #E2E8F0;
-        font-family: 'Inter', sans-serif;
+        background-color: #0B0F19 !important;
+        background-image: radial-gradient(at 0% 0%, rgba(0, 240, 255, 0.08) 0px, transparent 50%),
+                          radial-gradient(at 100% 100%, rgba(124, 58, 237, 0.08) 0px, transparent 50%) !important;
+        color: #F8FAFC !important;
+        font-family: 'Inter', sans-serif !important;
     }
 
+    /* Sidebar em Modo Escuro Unificado */
+    section[data-testid="stSidebar"] {
+        background-color: #0D131F !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+    section[data-testid="stSidebar"] * {
+        color: #E2E8F0 !important;
+    }
+
+    /* Textos Gerais e Rótulos com Contraste Total */
+    p, span, label, div {
+        color: #E2E8F0 !important;
+    }
+    
+    /* Títulos */
+    h1, h2, h3, h4, h5, h6 {
+        color: #FFFFFF !important;
+        font-weight: 700 !important;
+    }
+
+    /* Textos dos Radio Buttons (Modo de Consolidação) */
+    div[data-testid="stRadio"] label, 
+    div[data-testid="stRadio"] label p, 
+    div[data-testid="stRadio"] div[role="radiogroup"] span {
+        color: #F8FAFC !important;
+        font-size: 15px !important;
+        font-weight: 500 !important;
+    }
+
+    /* Textos dos Checkboxes (Seleção de Colunas) */
+    div[data-testid="stCheckbox"] label, 
+    div[data-testid="stCheckbox"] label p, 
+    div[data-testid="stCheckbox"] span {
+        color: #F8FAFC !important;
+        font-size: 15px !important;
+        font-weight: 500 !important;
+    }
+
+    /* Cabeçalho Principal */
     .cyber-header {
-        background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6));
-        border: 1px solid rgba(0, 240, 255, 0.25);
-        border-radius: 18px;
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.8));
+        border: 1px solid rgba(0, 240, 255, 0.3);
+        border-radius: 16px;
         padding: 24px 30px;
-        margin-bottom: 24px;
-        box-shadow: 0 10px 30px -10px rgba(0, 240, 255, 0.15);
-        backdrop-filter: blur(12px);
+        margin-bottom: 28px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 240, 255, 0.08);
     }
     .cyber-tag {
         font-family: 'Rajdhani', sans-serif;
-        color: #00F0FF;
+        color: #00F0FF !important;
         font-size: 13px;
         font-weight: 700;
         letter-spacing: 3px;
         text-transform: uppercase;
     }
     .cyber-title {
-        color: #FFFFFF;
-        font-size: 32px;
+        color: #FFFFFF !important;
+        font-size: 30px;
         font-weight: 800;
         margin: 4px 0 6px 0;
     }
     .cyber-desc {
-        color: #94A3B8;
-        font-size: 14px;
+        color: #94A3B8 !important;
+        font-size: 14.5px;
         margin: 0;
     }
 
-    .glass-card {
-        background: rgba(15, 23, 42, 0.65);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 14px;
-        padding: 20px;
-        backdrop-filter: blur(10px);
-        margin-bottom: 16px;
+    /* Área de Upload */
+    div[data-testid="stFileUploader"] {
+        background: #111827 !important;
+        border: 1px dashed rgba(0, 240, 255, 0.4) !important;
+        border-radius: 14px !important;
+        padding: 20px !important;
+    }
+    div[data-testid="stFileUploader"] section {
+        background: transparent !important;
+    }
+    div[data-testid="stFileUploader"] section * {
+        color: #E2E8F0 !important;
     }
 
+    /* Botão Principal */
+    div.stButton > button:first-child {
+        background: linear-gradient(135deg, #00F0FF 0%, #3B82F6 50%, #8B5CF6 100%) !important;
+        color: #FFFFFF !important;
+        font-weight: 700 !important;
+        font-size: 16px !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 16px 28px !important;
+        box-shadow: 0 4px 20px rgba(0, 240, 255, 0.3) !important;
+        transition: all 0.2s ease !important;
+    }
+    div.stButton > button:first-child:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 25px rgba(0, 240, 255, 0.5) !important;
+    }
+
+    /* Botão de Download */
+    div.stDownloadButton > button:first-child {
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+        color: #FFFFFF !important;
+        font-weight: 700 !important;
+        font-size: 16px !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 16px 28px !important;
+        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3) !important;
+    }
+
+    /* Indicadores / KPIs */
     .kpi-container {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 16px;
-        margin-bottom: 24px;
+        margin: 24px 0;
     }
     .kpi-box {
-        background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.5));
-        border: 1px solid rgba(0, 240, 255, 0.2);
+        background: #111827;
+        border: 1px solid rgba(0, 240, 255, 0.25);
         border-radius: 14px;
-        padding: 16px 20px;
+        padding: 18px 22px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
     .kpi-label {
         font-size: 12px;
-        color: #94A3B8;
+        color: #94A3B8 !important;
         text-transform: uppercase;
         letter-spacing: 1px;
         font-weight: 600;
     }
     .kpi-value {
-        font-size: 24px;
+        font-size: 26px;
         font-weight: 800;
-        color: #00F0FF;
+        color: #00F0FF !important;
         margin-top: 4px;
         font-family: 'Rajdhani', sans-serif;
-    }
-
-    div.stButton > button:first-child {
-        background: linear-gradient(135deg, #00F0FF 0%, #3B82F6 50%, #8B5CF6 100%) !important;
-        color: #FFFFFF !important;
-        font-weight: 700 !important;
-        font-size: 15px !important;
-        border: none !important;
-        border-radius: 12px !important;
-        padding: 14px 28px !important;
-    }
-
-    div.stDownloadButton > button:first-child {
-        background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
-        color: #FFFFFF !important;
-        font-weight: 700 !important;
-        border: none !important;
-        border-radius: 12px !important;
-        padding: 14px 28px !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -122,11 +178,11 @@ def verificar_autenticacao():
 
     if not st.session_state.autenticado:
         st.markdown("""
-        <div style="max-width: 480px; margin: 60px auto 20px auto; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(0, 240, 255, 0.3); border-radius: 20px; padding: 30px; text-align: center;">
+        <div style="max-width: 480px; margin: 60px auto 20px auto; background: #111827; border: 1px solid rgba(0, 240, 255, 0.3); border-radius: 20px; padding: 30px; text-align: center;">
             <div style="font-size: 36px; margin-bottom: 8px;">🔐</div>
             <div style="font-family: 'Rajdhani', sans-serif; color: #00F0FF; font-size: 13px; letter-spacing: 3px; font-weight: 700;">ACESSO SEGURO</div>
             <h2 style="color: #FFF; margin: 6px 0 10px 0; font-size: 24px;">Conversor de XML em dados</h2>
-            <p style="color: #94A3B8; font-size: 13px; margin: 0;">Insira a credencial de segurança para acessar o sistema.</p>
+            <p style="color: #CBD5E1; font-size: 14px; margin: 0;">Insira a credencial de segurança para acessar o sistema.</p>
         </div>
         """, unsafe_allow_html=True)
         
@@ -164,18 +220,21 @@ with st.sidebar:
         st.rerun()
 
 # 5. Upload de Arquivos
-st.markdown("#### 📂 1. Importação de Arquivos XML")
-arquivos_xml = st.file_uploader("Selecione ou arraste todos os arquivos XML", type=["xml"], accept_multiple_files=True)
+st.markdown("### 📂 1. Importação de Arquivos XML")
+st.markdown("<p style='color: #CBD5E1; font-size: 14.5px;'>Selecione ou arraste os arquivos XML das notas fiscais (suporta modelos 55, 65 e 59):</p>", unsafe_allow_html=True)
+arquivos_xml = st.file_uploader("Upload de XMLs", type=["xml"], accept_multiple_files=True, label_visibility="collapsed")
+
+st.markdown("<br>", unsafe_allow_html=True)
 
 # 6. Configurações de Consolidação e Colunas
-st.markdown("#### ⚙️ 2. Parâmetros de Consolidação e Colunas")
+st.markdown("### ⚙️ 2. Parâmetros de Consolidação e Colunas")
 col_card1, col_card2 = st.columns(2)
 
 with col_card1:
     st.markdown("""
-    <div class="glass-card">
-        <span style="color: #00F0FF; font-weight: 700; font-size: 14px;">📊 REGRA DE DUPLICADOS</span>
-        <p style="color: #94A3B8; font-size: 13px; margin: 4px 0 12px 0;">Como consolidar itens repetidos ao longo dos meses:</p>
+    <div style="background: #111827; border: 1px solid rgba(0, 240, 255, 0.25); border-radius: 12px; padding: 14px 18px; margin-bottom: 12px;">
+        <span style="color: #00F0FF; font-weight: 700; font-size: 14px; letter-spacing: 1px;">📊 REGRA DE DUPLICADOS</span>
+        <p style="color: #CBD5E1; font-size: 13px; margin: 4px 0 0 0;">Como consolidar itens repetidos ao longo dos meses:</p>
     </div>
     """, unsafe_allow_html=True)
     modo_consolidacao = st.radio(
@@ -191,9 +250,9 @@ with col_card1:
 
 with col_card2:
     st.markdown("""
-    <div class="glass-card">
-        <span style="color: #8B5CF6; font-weight: 700; font-size: 14px;">📌 SELEÇÃO DE CAMPOS EXPORTADOS</span>
-        <p style="color: #94A3B8; font-size: 13px; margin: 4px 0 8px 0;">Marque as colunas que devem constar no relatório:</p>
+    <div style="background: #111827; border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 12px; padding: 14px 18px; margin-bottom: 12px;">
+        <span style="color: #C084FC; font-weight: 700; font-size: 14px; letter-spacing: 1px;">📌 SELEÇÃO DE CAMPOS EXPORTADOS</span>
+        <p style="color: #CBD5E1; font-size: 13px; margin: 4px 0 0 0;">Marque as colunas que devem constar no relatório:</p>
     </div>
     """, unsafe_allow_html=True)
     c1, c2 = st.columns(2)
@@ -442,6 +501,8 @@ def gerar_excel(df, titulo_aba="Notas Fiscais"):
     return output.getvalue()
 
 # 8. Execução
+st.markdown("<br>", unsafe_allow_html=True)
+
 if arquivos_xml:
     if not colunas_selecionadas:
         st.warning("⚠️ Marque ao menos uma coluna acima para gerar o relatório.")
