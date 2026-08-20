@@ -35,7 +35,7 @@ if not verificar_autenticacao():
 
 # --- APLICAÇÃO PRINCIPAL ---
 st.title("📄 Conversor de Notas Fiscais (XML) para Excel")
-st.write("Selecione ou arraste múltiplos arquivos XML de notas fiscais para consolidar todos os produtos em uma planilha.")
+st.write("Selecione ou arraste múltiplos arquivos XML para consolidar os dados dos produtos em uma planilha personalizada.")
 
 # Botão de logout no menu lateral
 with st.sidebar:
@@ -44,24 +44,60 @@ with st.sidebar:
         st.session_state.autenticado = False
         st.rerun()
 
-# Upload dos arquivos
+# 1. Upload dos arquivos
 arquivos_xml = st.file_uploader(
     "Arraste ou selecione todos os arquivos XML", 
     type=["xml"], 
     accept_multiple_files=True
 )
 
-# Opções de agrupamento e duplicados
-st.write("### ⚙️ Opções de Relatório")
-modo_consolidacao = st.radio(
-    "Como deseja tratar itens comprados mais de uma vez no período?",
-    options=[
-        "Consolidar produtos (Somar quantidades e calcular custo médio)",
-        "Manter apenas o preço da última compra (Custo mais recente)",
-        "Listar todas as compras (Histórico completo sem agrupar)"
-    ],
-    index=0
-)
+st.write("---")
+
+# 2. Configurações de Relatório
+st.subheader("⚙️ Configurações da Planilha")
+
+col_opcoes1, col_opcoes2 = st.columns()
+
+with col_opcoes1:
+    st.write("**Tratamento de compras repetidas:**")
+    modo_consolidacao = st.radio(
+        "Selecione como tratar o mesmo produto comprado mais de uma vez:",
+        options=[
+            "Consolidar produtos (Somar quantidades e calcular custo médio)",
+            "Manter apenas o preço da última compra (Custo mais recente)",
+            "Listar todas as compras (Histórico completo sem agrupar)"
+        ],
+        index=0
+    )
+
+with col_opcoes2:
+    st.write("**Selecione as colunas que deseja na planilha:**")
+    col_c1, col_c2 = st.columns(2)
+    with col_c1:
+        f_arquivo = st.checkbox("Arquivo", value=True)
+        f_data = st.checkbox("Data", value=True)
+        f_estab = st.checkbox("Estabelecimento", value=True)
+        f_end = st.checkbox("Endereço", value=True)
+        f_cod = st.checkbox("Código do Produto", value=True)
+    with col_c2:
+        f_ean = st.checkbox("EAN", value=True)
+        f_desc = st.checkbox("Descrição do Produto", value=True)
+        f_qtd = st.checkbox("Quantidade", value=True)
+        f_unit = st.checkbox("Custo Unitário", value=True)
+        f_total = st.checkbox("Custo Total", value=True)
+
+# Mapeia as colunas selecionadas
+colunas_selecionadas = []
+if f_arquivo: colunas_selecionadas.append("Arquivo")
+if f_data: colunas_selecionadas.append("Data")
+if f_estab: colunas_selecionadas.append("Estabelecimento")
+if f_end: colunas_selecionadas.append("Endereço")
+if f_cod: colunas_selecionadas.append("Código do Produto")
+if f_ean: colunas_selecionadas.append("EAN")
+if f_desc: colunas_selecionadas.append("Descrição do Produto")
+if f_qtd: colunas_selecionadas.append("Quantidade")
+if f_unit: colunas_selecionadas.append("Custo Unitário")
+if f_total: colunas_selecionadas.append("Custo Total")
 
 def parse_xml_content(content_bytes, file_name=""):
     try:
@@ -159,18 +195,18 @@ def parse_xml_content(content_bytes, file_name=""):
             vProd = 0.0
             
         itens.append({
-            'Data da Emissão': data_emissao,
+            'Arquivo': file_name,
+            'Data': data_emissao,
             'Data_ISO': data_iso,
             'Número da NF': numero_nf,
-            'Arquivo': file_name,
-            'Nome do Estabelecimento': nome_fornecedor,
+            'Estabelecimento': nome_fornecedor,
             'Endereço': endereco_fornecedor,
             'Código do Produto': cProd,
             'EAN': cEAN,
             'Descrição do Produto': xProd,
             'Quantidade': qCom,
-            'Custo Unitário (R$)': vUnCom,
-            'Custo Total (R$)': vProd
+            'Custo Unitário': vUnCom,
+            'Custo Total': vProd
         })
         
     return itens
@@ -192,60 +228,36 @@ def processar_todos_xmls(arquivos):
             
     return pd.DataFrame(todos_itens), arquivos_com_erro
 
-def aplicar_tratamento_duplicados(df, modo):
+def aplicar_tratamento_e_colunas(df, modo, colunas_escolhidas):
     if df.empty:
         return df
 
-    # Ordena por data (ISO) para garantir que a última compra seja a mais recente
     if 'Data_ISO' in df.columns:
         df = df.sort_values(by=['Data_ISO', 'Número da NF'])
 
-    group_cols = ['Nome do Estabelecimento', 'Código do Produto', 'EAN', 'Descrição do Produto']
+    group_cols = ['Estabelecimento', 'Endereço', 'Código do Produto', 'EAN', 'Descrição do Produto']
 
     if modo.startswith("Consolidar produtos"):
         df_agrupado = df.groupby(group_cols, as_index=False).agg(
-            Quantidade_Total=('Quantidade', 'sum'),
-            Custo_Total=('Custo Total (R$)', 'sum'),
-            Ultimo_Custo=('Custo Unitário (R$)', 'last'),
-            Qtd_Compras=('Quantidade', 'count'),
-            Ultima_Compra=('Data da Emissão', 'last')
+            Quantidade=('Quantidade', 'sum'),
+            Custo_Total=('Custo Total', 'sum'),
+            Ultimo_Custo=('Custo Unitário', 'last'),
+            Data=('Data', 'last'),
+            Arquivo=('Arquivo', lambda x: ', '.join(x.unique()))
         )
-        df_agrupado['Custo Médio Unitário (R$)'] = (df_agrupado['Custo_Total'] / df_agrupado['Quantidade_Total']).round(2)
-        
-        df_agrupado = df_agrupado.rename(columns={
-            'Quantidade_Total': 'Quantidade Total',
-            'Custo_Total': 'Custo Total (R$)',
-            'Ultimo_Custo': 'Último Custo Unitário (R$)',
-            'Qtd_Compras': 'Qtd. de Compras',
-            'Ultima_Compra': 'Última Compra'
-        })
-        
-        colunas_finais = [
-            'Nome do Estabelecimento', 'Código do Produto', 'EAN', 'Descrição do Produto',
-            'Qtd. de Compras', 'Quantidade Total', 'Custo Médio Unitário (R$)',
-            'Último Custo Unitário (R$)', 'Custo Total (R$)', 'Última Compra'
-        ]
-        return df_agrupado[colunas_finais]
+        df_agrupado['Custo Unitário'] = (df_agrupado['Custo_Total'] / df_agrupado['Quantidade']).round(2)
+        df_agrupado['Custo Total'] = df_agrupado['Custo_Total'].round(2)
+        df_final = df_agrupado
 
     elif modo.startswith("Manter apenas o preço da última compra"):
-        df_ultimo = df.drop_duplicates(subset=group_cols, keep='last').copy()
-        colunas_finais = [
-            'Data da Emissão', 'Número da NF', 'Nome do Estabelecimento',
-            'Código do Produto', 'EAN', 'Descrição do Produto',
-            'Quantidade', 'Custo Unitário (R$)', 'Custo Total (R$)', 'Arquivo'
-        ]
-        colunas_existentes = [c for c in colunas_finais if c in df_ultimo.columns]
-        return df_ultimo[colunas_existentes]
+        df_final = df.drop_duplicates(subset=group_cols, keep='last').copy()
 
     else:
-        # Modo detalhado (todas as linhas)
-        colunas_finais = [
-            'Data da Emissão', 'Número da NF', 'Arquivo', 'Nome do Estabelecimento',
-            'Endereço', 'Código do Produto', 'EAN', 'Descrição do Produto',
-            'Quantidade', 'Custo Unitário (R$)', 'Custo Total (R$)'
-        ]
-        colunas_existentes = [c for c in colunas_finais if c in df.columns]
-        return df[colunas_existentes]
+        df_final = df.copy()
+
+    # Retorna apenas as colunas que a colaboradora marcou nas caixas de seleção
+    colunas_validas = [c for c in colunas_escolhidas if c in df_final.columns]
+    return df_final[colunas_validas]
 
 def gerar_excel(df, titulo_aba="Notas Fiscais"):
     wb = Workbook()
@@ -265,7 +277,7 @@ def gerar_excel(df, titulo_aba="Notas Fiscais"):
         bottom=Side(style='thin', color='D9D9D9')
     )
 
-    # 1. Estiliza o cabeçalho célula a célula
+    # 1. Estiliza o cabeçalho
     for col_idx in range(1, len(headers) + 1):
         c = ws.cell(row=1, column=col_idx)
         c.fill = header_fill
@@ -285,13 +297,10 @@ def gerar_excel(df, titulo_aba="Notas Fiscais"):
             if 'Quantidade' in header:
                 cell.number_format = '#,##0.00'
                 cell.alignment = align_center
-            elif header in ['Qtd. de Compras', 'Número da NF']:
-                cell.number_format = '#,##0'
-                cell.alignment = align_center
             elif 'Custo' in header or 'Preço' in header or 'Valor' in header:
                 cell.number_format = '"R$ "#,##0.00'
                 cell.alignment = align_center
-            elif header in ['Código do Produto', 'EAN', 'Arquivo', 'Data da Emissão', 'Última Compra']:
+            elif header in ['Código do Produto', 'EAN', 'Arquivo', 'Data']:
                 cell.alignment = align_center
             else:
                 cell.alignment = align_left
@@ -315,42 +324,45 @@ def gerar_excel(df, titulo_aba="Notas Fiscais"):
     wb.save(output)
     return output.getvalue()
 
+# Botão de processamento
 if arquivos_xml:
-    if st.button("Processar Notas Fiscais", type="primary"):
-        with st.spinner("Processando os arquivos XML e gerando a planilha..."):
-            df_bruto, erros = processar_todos_xmls(arquivos_xml)
-            
-            if not df_bruto.empty:
-                # Aplica o filtro/consolidação escolhido
-                df_final = aplicar_tratamento_duplicados(df_bruto, modo_consolidacao)
+    if not colunas_selecionadas:
+        st.warning("⚠️ Marque ao menos uma coluna acima para gerar a planilha.")
+    else:
+        if st.button("Processar Notas Fiscais", type="primary"):
+            with st.spinner("Processando os arquivos XML e gerando a planilha..."):
+                df_bruto, erros = processar_todos_xmls(arquivos_xml)
                 
-                total_itens_extraidos = len(df_bruto)
-                total_itens_unicos = len(df_final)
-                
-                st.success(
-                    f"Sucesso! {len(arquivos_xml)} arquivo(s) lido(s). "
-                    f"Total de {total_itens_extraidos} compras encontradas ➔ {total_itens_unicos} produtos gerados na planilha."
-                )
-                
-                if erros:
-                    with st.expander("Avisos sobre arquivos não lidos:"):
+                if not df_bruto.empty:
+                    df_final = aplicar_tratamento_e_colunas(df_bruto, modo_consolidacao, colunas_selecionadas)
+                    
+                    total_itens_extraidos = len(df_bruto)
+                    total_itens_gerados = len(df_final)
+                    
+                    st.success(
+                        f"Sucesso! {len(arquivos_xml)} arquivo(s) lido(s). "
+                        f"Total de {total_itens_extraidos} compras encontradas ➔ {total_itens_gerados} linhas geradas."
+                    )
+                    
+                    if erros:
+                        with st.expander("Avisos sobre arquivos não lidos:"):
+                            for err in erros:
+                                st.warning(err)
+                    
+                    excel_data = gerar_excel(df_final, titulo_aba="Relatório")
+                    
+                    st.download_button(
+                        label="📥 Baixar Planilha Excel Formatada (.xlsx)",
+                        data=excel_data,
+                        file_name="Relatorio_Notas_Fiscais.xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        type="primary"
+                    )
+                    
+                    st.write("### Prévia do Relatório Gerado:")
+                    st.dataframe(df_final, use_container_width=True)
+                else:
+                    st.error("Não foi possível extrair produtos dos arquivos enviados.")
+                    if erros:
                         for err in erros:
                             st.warning(err)
-                
-                excel_data = gerar_excel(df_final, titulo_aba="Relatório")
-                
-                st.download_button(
-                    label="📥 Baixar Planilha Excel Formatada (.xlsx)",
-                    data=excel_data,
-                    file_name="Relatorio_Notas_Fiscais.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    type="primary"
-                )
-                
-                st.write("### Prévia do Relatório Gerado:")
-                st.dataframe(df_final, use_container_width=True)
-            else:
-                st.error("Não foi possível extrair produtos dos arquivos enviados.")
-                if erros:
-                    for err in erros:
-                        st.warning(err)
