@@ -8,7 +8,7 @@ from openpyxl.utils.dataframe import dataframe_to_rows
 from io import BytesIO
 
 # Configuração da página
-st.set_page_config(page_title="NFe Data Matrix", layout="wide", page_icon="⚡")
+st.set_page_config(page_title="Conversor de XML em dados", layout="wide", page_icon="⚡")
 
 # --- ESTILIZAÇÃO CSS FUTURISTA & GLASSMORPHISM ---
 st.markdown("""
@@ -155,11 +155,11 @@ def verificar_autenticacao():
 
     if not st.session_state.autenticado:
         st.markdown("""
-        <div style="max-width: 480px; margin: 60px auto; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(0, 240, 255, 0.3); border-radius: 20px; padding: 40px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); backdrop-filter: blur(15px); text-align: center;">
-            <div style="font-size: 40px; margin-bottom: 10px;">🔐</div>
-            <div style="font-family: 'Rajdhani', sans-serif; color: #00F0FF; font-size: 14px; letter-spacing: 3px; font-weight: 700;">ACESSO SEGURO</div>
-            <h2 style="color: #FFF; margin: 6px 0 20px 0;">Painel de Extração NFe</h2>
-            <p style="color: #94A3B8; font-size: 14px;">Insira a credencial de segurança para acessar o sistema.</p>
+        <div style="max-width: 480px; margin: 60px auto 20px auto; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(0, 240, 255, 0.3); border-radius: 20px; padding: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); backdrop-filter: blur(15px); text-align: center;">
+            <div style="font-size: 36px; margin-bottom: 8px;">🔐</div>
+            <div style="font-family: 'Rajdhani', sans-serif; color: #00F0FF; font-size: 13px; letter-spacing: 3px; font-weight: 700;">ACESSO SEGURO</div>
+            <h2 style="color: #FFF; margin: 6px 0 10px 0; font-size: 24px;">Conversor de XML em dados</h2>
+            <p style="color: #94A3B8; font-size: 13px; margin: 0;">Insira a credencial de segurança para acessar o sistema.</p>
         </div>
         """, unsafe_allow_html=True)
         
@@ -184,7 +184,7 @@ st.markdown("""
     <div style="display: flex; align-items: center; justify-content: space-between;">
         <div>
             <span class="cyber-tag">⚡ INTELLIGENCE MATRIX V2.0</span>
-            <div class="cyber-title">Conversor de Notas Fiscais (NFe)</div>
+            <div class="cyber-title">Conversor de XML em dados</div>
             <p class="cyber-desc">Extração automatizada de XMLs fiscais, consolidação de dados e geração de planilhas inteligentes.</p>
         </div>
     </div>
