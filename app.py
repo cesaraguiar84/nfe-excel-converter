@@ -137,7 +137,7 @@ st.markdown("""
         padding: 20px !important;
     }
 
-    /* Tabelas e Caixas de Texto */
+    /* Tabelas */
     div[data-testid="stDataFrame"] {
         border-radius: 14px;
         overflow: hidden;
@@ -210,7 +210,7 @@ arquivos_xml = st.file_uploader(
 
 # 2. Configurações de Consolidação e Colunas
 st.markdown("#### ⚙️ 2. Parâmetros de Consolidação e Colunas")
-col_card1, col_card2 = st.columns()
+col_card1, col_card2 = st.columns(2)
 
 with col_card1:
     st.markdown("""
